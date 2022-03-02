@@ -1,6 +1,8 @@
-{ config, lib, pkgs, ... }:
+{ lib, callPackage, linuxPackagesFor, ... }:
+# To test the kernel build:
+# nix-build -E "with import <nixpkgs> {}; (pkgs.callPackage ./linux-5.16.11.nix {}).kernel"
 let
-  repos = pkgs.callPackage ../repos.nix {};
+  repos = callPackage ../repos.nix {};
   linuxPkg = { fetchurl, buildLinux, ... }@args:
     buildLinux (args // rec {
       version = "5.16.11";
@@ -82,4 +84,4 @@ let
         };
       }];
     } // (args.argsOverride or {}));
-in with pkgs; recurseIntoAttrs (linuxPackagesFor (callPackage linuxPkg {}))
+in lib.recurseIntoAttrs (linuxPackagesFor (callPackage linuxPkg {}))
